@@ -103,5 +103,11 @@ namespace ClientPlugin
             Instance.settingsGenerator.SetLayout<Simple>();
             MyGuiSandbox.AddScreen(Instance.settingsGenerator.Dialog);
         }
+        
+        //TODO: Uncomment and use this method to load asset files
+        /*public void LoadAssets(string folder)
+        {
+
+        }*/
     }
 }

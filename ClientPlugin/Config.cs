@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
+using ClientPlugin.Settings.Tools;
 using VRage.Input;
 using VRageMath;
 
@@ -42,6 +43,8 @@ namespace ClientPlugin
         public readonly string Title = "Config Demo";
 
         // TODO: Settings dialog controls, one property for each configuration option
+        
+        [Separator("Some settings")]
 
         [Checkbox(description: "Checkbox Tooltip")]
         public bool Toggle
@@ -78,6 +81,8 @@ namespace ClientPlugin
             set => SetField(ref dropdown, value);
         }
 
+        [Separator("More settings")]
+        
         [Color(description: "RGB color")]
         public Color Color
         {
