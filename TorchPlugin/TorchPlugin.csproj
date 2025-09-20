@@ -40,10 +40,6 @@
       <HintPath>$(Torch)\ControlzEx.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="EmptyKeys.UserInterface, Version=3.2.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\Bin64\EmptyKeys.UserInterface.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="MahApps.Metro, Version=1.6.1.4, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(Torch)\MahApps.Metro.dll</HintPath>
       <Private>False</Private>
@@ -622,7 +618,7 @@
     <Compile Include="PluginLogger.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="deploy.bat" />
+    <Content Include="Deploy.bat" />
     <Content Include="manifest.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -644,6 +640,6 @@
     <PreBuildEvent>call "$(SolutionDir)verify_props.bat" "$(Torch)"</PreBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
-    <PostBuildEvent>call "$(ProjectDir)deploy.bat" "$(TargetFileName)" "$(TargetDir)" "$(Torch)" "$(SolutionName)"</PostBuildEvent>
+    <PostBuildEvent>call "$(ProjectDir)Deploy.bat" "$(TargetFileName)" "$(TargetDir)" "$(Torch)" "$(SolutionName)"</PostBuildEvent>
   </PropertyGroup>
 </Project>
