@@ -1,12 +1,12 @@
 # Space Engineers Plugin Template
 
-[Client only version of the template](https://github.com/sepluginloader/ClientPluginTemplate)
+[Client only version of the template](https://github.com/viktor-ferenczi/se-client-plugin-template)
 
 ## Prerequisites
 
 - [Space Engineers](https://store.steampowered.com/app/244850/Space_Engineers/)
 - [Python 3.x](https://python.org) (tested with 3.9)
-- [Plugin Loader](https://github.com/sepluginloader)
+- [Pulsar](https://github.com/SpaceGT/Pulsar)
 - [Torch Server](https://torchapi.com/) in `C:\Torch`, run `Torch.Server.exe` once to prepare
 - [.NET Framework 4.8.1 Developer Pack](https://dotnet.microsoft.com/en-us/download/dotnet-framework/net481)
 
@@ -18,18 +18,18 @@
 4. Let `setup.py` auto-detect your install locations or fill them in manually
 5. Open the solution in Visual Studio or Rider
 6. Make a test build, it should deploy the resulting files to their respective target folders (see them in the build log)
-7. Test that the empty plugin can be enabled in Plugin Loader (client), Torch Server's UI and the Dedicated Server's UI
+7. Test that the empty plugin can be enabled in Pulsar (client), Torch Server's UI and the Dedicated Server's UI
 9. Replace the contents of this file with the description of your plugin
 10. Follow the TODO comments in the source code
 11. Look into the source code of other plugins for examples on how to patch the game
 
 You may find the source code of these plugins inspirational:
-- [Performance Improvements](https://github.com/viktor-ferenczi/performance-improvements)
-- [Multigrid Projector](https://github.com/viktor-ferenczi/multigrid-projector)
-- [Toolbar Manager](https://github.com/viktor-ferenczi/toolbar-manager)
+- [Performance Improvements](https://github.com/viktor-ferenczi/se-performance-improvements)
+- [Multigrid Projector](https://github.com/viktor-ferenczi/se-multigrid-projector)
+- [Toolbar Manager](https://github.com/viktor-ferenczi/se-toolbar-manager)
 
 In case of questions please feel free to ask the SE plugin developer community on the
-[Plugin Loader](https://discord.gg/6ETGRU3CzR) or the [Torch](https://discord.gg/xNFpHM6V8Q)
+[Pulsar](https://discord.gg/z8ZczP2YZY) or the [Torch](https://discord.gg/xNFpHM6V8Q)
 Discord server in their relevant text channels. They also have dedicated channels for
 plugin ideas, should you look for a new one.
 
@@ -130,8 +130,8 @@ any value on the player's host also disables game code verification.
 ### Release
 
 - Always make your final release from a RELEASE build. (More optimized, removes debug code.)
-- Always test your RELEASE build before publishing. Sometimes is behaves differently.
-- In case of client plugins the Plugin Loader compiles your code, watch out for differences.
+- Always test your RELEASE build before publishing. Sometimes it behaves differently.
+- In case of client plugins the Pulsar compiles your code, watch out for differences.
 
 ### Communication
 
