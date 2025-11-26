@@ -190,6 +190,10 @@ def _update_props(
     root = tree.getroot()
     group = root.find("PropertyGroup")
     assert group is not None
+    
+    # If Torch is found, then use the DedicatedServer64 from Torch
+    if torch_dir:
+        server_dir = torch_dir
 
     if game_dir:
         bin64 = group.find("Bin64")
