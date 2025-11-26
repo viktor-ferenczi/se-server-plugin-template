@@ -37,6 +37,31 @@ _Good luck!_
 
 ## Remarks
 
+### Using coding agents (AI, LLMs) for plugin development
+
+Use "AI" (Copilot, IDE integrated LLMs) to cut down on typing and to review your code.
+
+Read the `AGENTS.md` file for further hints and insight into plugin development.
+
+__How to set up an AI-assisted development environment as of November 2025__
+- Install VSCode + Copilot plugin + Cline plugin
+- Follow all the installation and configuration instructions
+- Pay $100/year for Copilot Plug if you can afford it
+- Select GPT-5 for Plan mode and GPT-5-mini for Act mode
+
+Much of the improvement comes from providing access to the game's code and content for the coding agent.
+Follow these instructions to set up a local MCP server: https://github.com/viktor-ferenczi/se-mcp-for-plugin-dev/
+
+You may want to keep the same project open in your usual editor (VS, Rider) for manual editing and debugging and use VSCode only for the AI.
+
+__How to efficiently develop with AI__
+- Always Plan first, then Act on the code base
+- Give as specific instructions as you can
+- Work in small, iterative steps, commit each step once works
+- Auto-approve editing files inside the project (you can always revert it)
+
+Expect the best setup and models to evolve rapidly.
+
 ### Plugin configuration
 
 You can have a nice configuration dialog with little effort in the game client.
@@ -119,6 +144,14 @@ any value on the player's host also disables game code verification.
 - To debug transpiler changes to the IL code it is most practical to generate the files
   of the method's IL code before and after the change made, so you can just diff them.
   Please see the transpiler example under the `Shared/Patches` folder for the details.
+
+### Accessing internal, protected and private members in game code
+
+Enable the Krafs publicizer to significantly reduce the amount of reflections you need to write.
+
+This can be done by systematically uncommenting the code sections marked with "Uncomment to enable publicizer support".
+Make sure not to miss any of those. List the game assemblies you need to publicize in `GameAssembliesToPublicize.cs`. 
+In case of problems read about the [Krafs Publicizer](https://github.com/krafs/Publicizer) or reach out on the [Pulsar](https://discord.gg/z8ZczP2YZY) Discord server.
 
 ### Troubleshooting
 
