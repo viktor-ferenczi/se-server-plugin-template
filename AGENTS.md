@@ -11,6 +11,10 @@ General instructions:
 - Never remove or modify the Space Engineers (game DLL) dependencies, they are good as is.
 - Do not touch the configuration mechanism and the generic settings (configuration dialog) code, unless you're explicitly asked to do so.
 - Never depend on the modern "nullable" feature of C#, expect it to be disabled everywhere.
+- Write the logic and patches into the Shared project. Add code in the target-specific projects (Client, Dedicated, Torch) only if it belongs only to that target necessary.
+- Write all new patches using the Harmony patching library. Never use the Torch patcher for any new patches.
+- Avoid writing spaghetti code, keep it human, understandable and easy to follow.
+- In the face of ambiguity resist the temptation to guess. Ask questions instead.
 
 Project build configuration, building the project:
 - If you need to build the code, then invoke `dotnet build`.
