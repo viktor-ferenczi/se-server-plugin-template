@@ -629,7 +629,6 @@
   <ItemGroup>
     <Content Include="Deploy.bat" />
     <Content Include="Kill-Space-Engineers.bat" />
-    <Content Include="PluginHub.xml" />
     <None Include="App.config" />
   </ItemGroup>
 
