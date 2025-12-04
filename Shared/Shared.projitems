@@ -33,9 +33,6 @@
     <Content Include="$(MSBuildThisFileDirectory)..\README.md">
       <Link>README.md</Link>
     </Content>
-    <Content Include="$(MSBuildThisFileDirectory)..\ReplaceGuidsAndRename.py">
-      <Link>ReplaceGuidsAndRename.py</Link>
-    </Content>
     <Content Include="$(MSBuildThisFileDirectory)Patches\LoadData.original.il" />
     <Content Include="$(MSBuildThisFileDirectory)Patches\LoadData.patched.il" />
   </ItemGroup>
