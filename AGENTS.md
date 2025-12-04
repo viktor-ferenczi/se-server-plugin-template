@@ -32,7 +32,6 @@ Project build configuration, building the project:
 Runtime patching:
 - The patching library used is Harmony, also called HarmonyLib.
 - Harmony allows for changing the IL code of the game at runtime, after the game's assemblies (DLLs) are already loaded into memory.
-- HarmonyLib documentation is here: https://harmony.pardeike.net/api/index.html
 - Harmony patches are applied on loading the game.
 - Before writing a plugin with patches, consider whether the implementation is possible as a Programmable Block script (PB API) or a mod (Mod API). (Usually it is not if writing a plugin comes up as a solution.)
 - Writing prefix and suffix patches is usually the way to go to change the game's internals. However, some changes can be done by using the same API as mods or even Programmable Block script. It depends on the usage.
@@ -60,6 +59,8 @@ Folder structure:
 - `TorchPlugin\ConfigView.xaml`: Description of the plugin configuration form loaded by the Torch Server.
 
 Where to get inspiration and existing knowledge from:
+- Documentation of the Krafs publicizer: https://github.com/krafs/Publicizer
+- Documentation of the Harmony patching library: https://harmony.pardeike.net/api/index.html
 - You can search for Space Engineers plugin projects on GitHub (their source code is public) for inspiration or ideas about how to solve specific issues.
 - Be careful with any information before 2019, because the game's code had been changing a lot before that year, making most information older than that unusable.
 - The Programmable Block API and Mod API have been pretty stable but slowly changing, including the removal of some features.
