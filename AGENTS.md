@@ -17,6 +17,7 @@ General instructions:
 - Write all new patches using the Harmony patching library. Never use the Torch patcher for any new patches.
 - Avoid writing spaghetti code, keep it human, understandable and easy to follow.
 - In the face of ambiguity resist the temptation to guess. Ask questions instead.
+- Always keep `// ReSharper` comments in place, they function like pragmas specific to JetBrains Resharper and Rider IDE.
 
 Project build configuration, building the project:
 - If you need to build the code, then invoke `dotnet build`.
