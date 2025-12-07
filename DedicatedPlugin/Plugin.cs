@@ -72,6 +72,10 @@ namespace DedicatedPlugin
 
         public void Update()
         {
+#if DEBUG
+            CustomUpdate();
+            Tick++;
+#else        
             if (failed)
                 return;
 
@@ -80,11 +84,12 @@ namespace DedicatedPlugin
                 CustomUpdate();
                 Tick++;
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                Log.Critical(ex, "Update failed");
+                Log.Critical(e, "Update failed");
                 failed = true;
             }
+#endif       
         }
 
         private void CustomUpdate()

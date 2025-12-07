@@ -124,6 +124,10 @@ namespace TorchPlugin
 
         public override void Update()
         {
+#if DEBUG
+            CustomUpdate();
+            Tick++;
+#else        
             if (failed)
                 return;
 
@@ -137,6 +141,7 @@ namespace TorchPlugin
                 Log.Critical(e, "Update failed");
                 failed = true;
             }
+#endif       
         }
 
         private void CustomUpdate()
