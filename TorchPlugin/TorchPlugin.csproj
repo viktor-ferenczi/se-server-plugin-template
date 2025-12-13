@@ -96,6 +96,18 @@
       <HintPath>$(Torch)\SteamKit2.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="SpaceEngineers.Game, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>$(Torch)\DedicatedServer64\SpaceEngineers.Game.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="SpaceEngineers.ObjectBuilders, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>$(Torch)\DedicatedServer64\SpaceEngineers.ObjectBuilders.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="SpaceEngineers.ObjectBuilders.XmlSerializers, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>$(Torch)\DedicatedServer64\SpaceEngineers.ObjectBuilders.XmlSerializers.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="Steamworks.NET, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(Torch)\Steamworks.NET.dll</HintPath>
       <Private>False</Private>

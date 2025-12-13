@@ -19,114 +19,114 @@ using Torch.API.Session;
 using Torch.Session;
 using VRage.Utils;
 
-namespace TorchPlugin
+namespace TorchPlugin;
+
+// ReSharper disable once ClassNeverInstantiated.Global
+public class Plugin : TorchPluginBase, IWpfPlugin, ICommonPlugin
 {
-    // ReSharper disable once ClassNeverInstantiated.Global
-    public class Plugin : TorchPluginBase, IWpfPlugin, ICommonPlugin
+    public const string PluginName = "PluginTemplate";
+    public static Plugin Instance { get; private set; }
+
+    public long Tick { get; private set; }
+
+    public IPluginLogger Log => Logger;
+    private static readonly IPluginLogger Logger = new PluginLogger(PluginName);
+
+    public IPluginConfig Config => config?.Data;
+    private PersistentConfig<PluginConfig> config;
+    private static readonly string ConfigFileName = $"{PluginName}.cfg";
+
+    // ReSharper disable once UnusedMember.Global
+    public UserControl GetControl() => control ?? (control = new ConfigView());
+    private ConfigView control;
+
+    private TorchSessionManager sessionManager;
+
+    private bool initialized;
+    private bool failed;
+
+    // ReSharper disable once UnusedMember.Local
+    private readonly Commands commands = new Commands();
+
+    [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
+    public override void Init(ITorchBase torch)
     {
-        public const string PluginName = "PluginTemplate";
-        public static Plugin Instance { get; private set; }
-
-        public long Tick { get; private set; }
-
-        public IPluginLogger Log => Logger;
-        private static readonly IPluginLogger Logger = new PluginLogger(PluginName);
-
-        public IPluginConfig Config => config?.Data;
-        private PersistentConfig<PluginConfig> config;
-        private static readonly string ConfigFileName = $"{PluginName}.cfg";
-
-        // ReSharper disable once UnusedMember.Global
-        public UserControl GetControl() => control ?? (control = new ConfigView());
-        private ConfigView control;
-
-        private TorchSessionManager sessionManager;
-
-        private bool initialized;
-        private bool failed;
-
-        // ReSharper disable once UnusedMember.Local
-        private readonly Commands commands = new Commands();
-
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-        public override void Init(ITorchBase torch)
-        {
-            base.Init(torch);
+        base.Init(torch);
 
 #if DEBUG
-            // Allow the debugger some time to connect once the plugin assembly is loaded
-            Thread.Sleep(100);
+        // Allow the debugger some time to connect once the plugin assembly is loaded
+        Thread.Sleep(100);
 #endif
 
-            Instance = this;
+        Instance = this;
 
-            Log.Info("Init");
+        Log.Info("Init");
 
-            var configPath = Path.Combine(StoragePath, ConfigFileName);
-            config = PersistentConfig<PluginConfig>.Load(Log, configPath);
+        var configPath = Path.Combine(StoragePath, ConfigFileName);
+        config = PersistentConfig<PluginConfig>.Load(Log, configPath);
 
-            var gameVersionNumber = MyPerGameSettings.BasicGameInfo.GameVersion ?? 0;
-            var gameVersion = new StringBuilder(MyBuildNumbers.ConvertBuildNumberFromIntToString(gameVersionNumber)).ToString();
-            Common.SetPlugin(this, gameVersion, StoragePath);
+        var gameVersionNumber = MyPerGameSettings.BasicGameInfo.GameVersion ?? 0;
+        var gameVersion = new StringBuilder(MyBuildNumbers.ConvertBuildNumberFromIntToString(gameVersionNumber)).ToString();
+        Common.SetPlugin(this, gameVersion, StoragePath);
 
 #if USE_HARMONY
-            if (!PatchHelpers.HarmonyPatchAll(Log, new Harmony(Name)))
-            {
-                failed = true;
-                return;
-            }
+        if (!PatchHelpers.HarmonyPatchAll(Log, new Harmony(Name)))
+        {
+            failed = true;
+            return;
+        }
 #endif
 
-            sessionManager = torch.Managers.GetManager<TorchSessionManager>();
-            sessionManager.SessionStateChanged += SessionStateChanged;
+        sessionManager = torch.Managers.GetManager<TorchSessionManager>();
+        sessionManager.SessionStateChanged += SessionStateChanged;
 
-            initialized = true;
+        initialized = true;
+    }
+
+    private void SessionStateChanged(ITorchSession session, TorchSessionState newstate)
+    {
+        switch (newstate)
+        {
+            case TorchSessionState.Loading:
+                Log.Debug("Loading");
+                break;
+
+            case TorchSessionState.Loaded:
+                Log.Debug("Loaded");
+                break;
+
+            case TorchSessionState.Unloading:
+                Log.Debug("Unloading");
+                break;
+
+            case TorchSessionState.Unloaded:
+                Log.Debug("Unloaded");
+                break;
+        }
+    }
+
+    public override void Dispose()
+    {
+        if (initialized)
+        {
+            Log.Debug("Disposing");
+
+            sessionManager.SessionStateChanged -= SessionStateChanged;
+            sessionManager = null;
+
+            Log.Debug("Disposed");
         }
 
-        private void SessionStateChanged(ITorchSession session, TorchSessionState newstate)
-        {
-            switch (newstate)
-            {
-                case TorchSessionState.Loading:
-                    Log.Debug("Loading");
-                    break;
+        Instance = null;
 
-                case TorchSessionState.Loaded:
-                    Log.Debug("Loaded");
-                    break;
+        base.Dispose();
+    }
 
-                case TorchSessionState.Unloading:
-                    Log.Debug("Unloading");
-                    break;
-
-                case TorchSessionState.Unloaded:
-                    Log.Debug("Unloaded");
-                    break;
-            }
-        }
-
-        public override void Dispose()
-        {
-            if (initialized)
-            {
-                Log.Debug("Disposing");
-
-                sessionManager.SessionStateChanged -= SessionStateChanged;
-                sessionManager = null;
-
-                Log.Debug("Disposed");
-            }
-
-            Instance = null;
-
-            base.Dispose();
-        }
-
-        public override void Update()
-        {
+    public override void Update()
+    {
 #if DEBUG
-            CustomUpdate();
-            Tick++;
+        CustomUpdate();
+        Tick++;
 #else        
             if (failed)
                 return;
@@ -142,12 +142,11 @@ namespace TorchPlugin
                 failed = true;
             }
 #endif       
-        }
+    }
 
-        private void CustomUpdate()
-        {
-            // TODO: Put your update processing here. It is called on every simulation frame!
-            PatchHelpers.PatchUpdates();
-        }
+    private void CustomUpdate()
+    {
+        // TODO: Put your update processing here. It is called on every simulation frame!
+        PatchHelpers.PatchUpdates();
     }
 }
