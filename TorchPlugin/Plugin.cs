@@ -124,23 +124,23 @@ public class Plugin : TorchPluginBase, IWpfPlugin, ICommonPlugin
 
     public override void Update()
     {
+        if (failed)
+            return;
+        
 #if DEBUG
         CustomUpdate();
         Tick++;
 #else        
-            if (failed)
-                return;
-
-            try
-            {
-                CustomUpdate();
-                Tick++;
-            }
-            catch (Exception e)
-            {
-                Log.Critical(e, "Update failed");
-                failed = true;
-            }
+        try
+        {
+            CustomUpdate();
+            Tick++;
+        }
+        catch (Exception e)
+        {
+            Log.Critical(e, "Update failed");
+            failed = true;
+        }
 #endif       
     }
 

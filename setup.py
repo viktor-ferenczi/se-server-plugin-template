@@ -6,10 +6,10 @@ Requires Python 3.12 or newer.
 import json
 import os
 import re
-import typing
 import uuid
 import winreg
 import xml.etree.ElementTree as ET
+from typing import Iterator, Tuple
 
 DRY_RUN = False
 
@@ -90,9 +90,9 @@ def _rename_project(name: str) -> None:
         "c889318f-9835-4814-b26e-979242caeb0c": torch_guid,
     }
 
-    def iter_paths() -> typing.Iterator[tuple[str, str]]:
+    def iter_paths() -> Iterator[Tuple[str, str]]:
         print("Solution:")
-        for filename in ('PluginTemplate.sln', 'PluginTemplate.sln.DotSettings.user', 'PluginTemplate.xml'):
+        for filename in ('PluginTemplate.sln', 'PluginTemplate.xml'):
             if os.path.exists(filename):
                 yield filename, filename
 

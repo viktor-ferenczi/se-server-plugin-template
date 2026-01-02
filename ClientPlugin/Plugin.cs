@@ -84,13 +84,13 @@ public class Plugin : IPlugin, ICommonPlugin
 
     public void Update()
     {
+        if (failed)
+            return;
+
 #if DEBUG
         CustomUpdate();
         Tick++;
 #else        
-        if (failed)
-            return;
-
         try
         {
             CustomUpdate();

@@ -4,7 +4,6 @@ using System.Diagnostics.CodeAnalysis;
 using HarmonyLib;
 using Sandbox.Game.Multiplayer;
 using Shared.Config;
-using Shared.Plugin;
 using Shared.Tools;
 using SpaceEngineers.Game.EntityComponents.Blocks;
 
@@ -15,7 +14,7 @@ namespace Shared.Patches;
 [HarmonyPatch(typeof(MyLcdSurfaceComponent))]
 public static class MyLcdSurfaceComponentPatch
 {
-    private static IPluginConfig Config => Common.Config;
+    private static IPluginConfig Config => Plugin.Common.Config;
 
     [HarmonyPrefix]
     [HarmonyPatch("UpdateVisibility")]
@@ -25,7 +24,8 @@ public static class MyLcdSurfaceComponentPatch
         if (!Sync.IsDedicated)
             return true;
 
-        return !true /*Config.FixTextPanel*/;
+        // Make it configurable, for example Config.FixTextPanel
+        return false;
     }
 }
 

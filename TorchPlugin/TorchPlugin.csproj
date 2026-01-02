@@ -532,10 +532,6 @@
       <HintPath>$(Torch)\DedicatedServer64\VRage.Dedicated.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="VRage.EOS, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>$(Torch)\DedicatedServer64\VRage.EOS.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="VRage.EOS.XmlSerializers, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
       <HintPath>$(Torch)\DedicatedServer64\VRage.EOS.XmlSerializers.dll</HintPath>
       <Private>False</Private>
