@@ -5,7 +5,7 @@
     <OutputType>Library</OutputType>
     <RootNamespace>TorchPlugin</RootNamespace>
     <AssemblyName>PluginTemplate</AssemblyName>
-    <LangVersion>13</LangVersion>
+    <LangVersion>14</LangVersion>
     <UseWPF>true</UseWPF>
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <AssemblyVersion>1.0.0.0</AssemblyVersion>
@@ -622,7 +622,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Lib.Harmony" Version="2.3.6" />
+    <PackageReference Include="Lib.Harmony" Version="2.4.2" />
     <!-- Uncomment to enable publicizer support  
     <PackageReference Include="Krafs.Publicizer" Version="2.3.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
