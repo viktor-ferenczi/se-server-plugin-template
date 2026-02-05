@@ -9,9 +9,10 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Text;
+using ClientPlugin.Tools;
 using HarmonyLib;
 
-namespace ClientPlugin.Tools;
+namespace Shared.Tools;
 
 public static class TranspilerHelpers
 {
