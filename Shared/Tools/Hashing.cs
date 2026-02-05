@@ -2,8 +2,9 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using HarmonyLib;
+using Mono.Cecil.Cil;
 
-namespace Shared.Tools;
+namespace ClientPlugin.Tools;
 
 public static class Hashing
 {
@@ -54,6 +55,24 @@ public static class Hashing
 
             foreach (var label in instruction.labels)
                 yield return label.GetHashCode();
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static IEnumerable<int> HashInstructions(this IEnumerable<Instruction> instructions)
+    {
+        foreach (var instruction in instructions)
+        {
+            yield return instruction.Offset.GetHashCode();
+            yield return instruction.OpCode.GetHashCode();
+
+            if (instruction.Operand == null)
+                continue;
+
+            if (instruction.Operand.GetType().IsValueType)
+                yield return instruction.Operand.GetHashCode();
+            else if (instruction.Operand is string s)
+                yield return s.Hash();
         }
     }
 
