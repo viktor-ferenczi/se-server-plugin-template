@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 using HarmonyLib;
 using Mono.Cecil.Cil;
 
-namespace ClientPlugin.Tools;
+namespace Shared.Tools;
 
 public static class Hashing
 {

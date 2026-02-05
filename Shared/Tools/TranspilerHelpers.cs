@@ -9,7 +9,6 @@ using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
 using System.Text;
-using ClientPlugin.Tools;
 using HarmonyLib;
 
 namespace Shared.Tools;
