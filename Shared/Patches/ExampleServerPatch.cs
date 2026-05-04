@@ -18,7 +18,7 @@ public static class MyLcdSurfaceComponentPatch
 
     [HarmonyPrefix]
     [HarmonyPatch("UpdateVisibility")]
-    [EnsureCode("3e177a11")]
+    [EnsureCode("83495656")]
     private static bool UpdateVisibilityPrefix()
     {
         if (!Sync.IsDedicated)
