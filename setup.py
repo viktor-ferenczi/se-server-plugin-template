@@ -3,13 +3,16 @@ Replaces project GUIDs and renames the solution
 Requires Python 3.12 or newer.
 """
 
-import json
 import os
 import re
+import sys
 import uuid
-import winreg
 import xml.etree.ElementTree as ET
+from pathlib import Path
 from typing import Iterator, Tuple
+
+if sys.platform == "win32":
+    import winreg
 
 DRY_RUN = False
 
@@ -101,8 +104,8 @@ def _rename_project(name: str) -> None:
             print(f"{project_name}:")
 
             for dirpath, _, filenames in os.walk(project_name):
-                dirpath2 = dirpath + "\\"
-                if "\\obj\\" in dirpath2 or "\\bin\\" in dirpath2:
+                parts = set(Path(dirpath).parts)
+                if "obj" in parts or "bin" in parts:
                     continue
 
                 for filename in filenames:
@@ -126,39 +129,106 @@ def _rename_project(name: str) -> None:
             os.rename(path, dst_path)
 
 
-def _get_steam_path() -> str:
+def _get_windows_steam_path() -> str | None:
     reg = winreg.ConnectRegistry(None, winreg.HKEY_LOCAL_MACHINE)
     key = winreg.OpenKey(reg, r"SOFTWARE\WOW6432Node\Valve\Steam")
     (path, _) = winreg.QueryValueEx(key, "InstallPath")
     return path
 
 
-def _valve_to_json(vdf: str) -> dict[str, dict[str, str | dict]]:
-    vdf = re.sub(r'"\n\t*\{', r'": {', vdf)
-    vdf = re.sub(r'"\t\t"', r'": "', vdf)
-    vdf = re.sub(r"\}\n", r"},\n", vdf)
-    vdf = re.sub(r'"\n', r'",\n', vdf)
-    vdf = re.sub(r'",\n(\t+)\}', r'"\n\1}', vdf)
-    vdf = re.sub(r"\},\n(\t*)(?=})", r"}\n\1", vdf)
-    vdf = f"{{{vdf[:-2]}}}"
-    return json.loads(vdf)
+def _get_linux_steam_path() -> str | None:
+    candidates = []
+
+    for env_name in ("STEAM_DIR", "STEAM_HOME"):
+        env_path = os.environ.get(env_name)
+        if env_path:
+            candidates.append(Path(env_path).expanduser())
+
+    home = Path.home()
+    candidates.extend(
+        [
+            home / ".steam" / "steam",
+            home / ".local" / "share" / "Steam",
+            home
+            / ".var"
+            / "app"
+            / "com.valvesoftware.Steam"
+            / ".local"
+            / "share"
+            / "Steam",
+        ]
+    )
+
+    for path in candidates:
+        if (path / "steamapps" / "libraryfolders.vdf").is_file():
+            return str(path)
+
+    for path in candidates:
+        if path.exists():
+            return str(path)
+
+    return None
+
+
+def _get_steam_path() -> str | None:
+    if sys.platform == "win32":
+        return _get_windows_steam_path()
+
+    return _get_linux_steam_path()
+
+
+def _parse_valve_key_values(vdf: str) -> dict[str, object]:
+    tokens = re.findall(r'"((?:\\.|[^"\\])*)"|([{}])', vdf)
+    index = 0
+
+    def decode_value(value: str) -> str:
+        return value.replace(r"\\", "\\").replace(r"\"", '"')
+
+    def read_token() -> str:
+        nonlocal index
+        if index >= len(tokens):
+            raise ValueError("Unexpected end of Valve VDF data")
+
+        quoted, brace = tokens[index]
+        index += 1
+        return decode_value(quoted) if quoted else brace
+
+    def read_object() -> dict[str, object]:
+        result: dict[str, object] = {}
+
+        while index < len(tokens):
+            key = read_token()
+            if key == "}":
+                return result
+
+            value = read_token()
+            if value == "{":
+                result[key] = read_object()
+            elif value == "}":
+                raise ValueError("Unexpected closing brace in Valve VDF data")
+            else:
+                result[key] = value
+
+        return result
+
+    return read_object()
 
 
 def _get_install_locations(vdf_path: str, ids: list[str]) -> dict[str, str | None]:
     with open(vdf_path, "r", encoding="UTF-8") as file:
-        vdf = file.read()
+        libraryfolders = _parse_valve_key_values(file.read())["libraryfolders"]
 
-    game_drives: dict[str, str | None] = {}
-    for folder in _valve_to_json(vdf)["libraryfolders"].values():
+    game_drives: dict[str, str | None] = {game_id: None for game_id in ids}
+    assert isinstance(libraryfolders, dict)
+
+    for folder in libraryfolders.values():
         assert isinstance(folder, dict)
         assert isinstance(folder["apps"], dict)
         assert isinstance(folder["path"], str)
 
         for game in ids:
-            if game in folder["apps"].keys():
+            if game in folder["apps"]:
                 game_drives[game] = folder["path"]
-            else:
-                game_drives[game] = None
 
     game_install: dict[str, str | None] = {}
     for game_id, drive in game_drives.items():
@@ -167,12 +237,17 @@ def _get_install_locations(vdf_path: str, ids: list[str]) -> dict[str, str | Non
             game_install[game_id] = None
 
         else:
-            path = f"{drive}\\steamapps\\appmanifest_{game_id}.acf"
+            path = Path(drive) / "steamapps" / f"appmanifest_{game_id}.acf"
             with open(path, "r", encoding="UTF-8") as file:
-                manifest = _valve_to_json(file.read())
+                manifest = _parse_valve_key_values(file.read())
 
-            game_install[game_id] = (
-                f"{drive}\\steamapps\\common\\{manifest["AppState"]["installdir"]}"
+            app_state = manifest["AppState"]
+            assert isinstance(app_state, dict)
+            install_dir = app_state["installdir"]
+            assert isinstance(install_dir, str)
+
+            game_install[game_id] = str(
+                Path(drive) / "steamapps" / "common" / install_dir
             )
 
     return game_install
@@ -196,12 +271,12 @@ def _update_props(
     if game_dir:
         bin64 = group.find("Bin64")
         assert bin64 is not None
-        bin64.text = f"{game_dir}\\Bin64"
+        bin64.text = str(Path(game_dir) / "Bin64")
 
     if server_dir:
         dedicated64 = group.find("Dedicated64")
         assert dedicated64 is not None
-        dedicated64.text = f"{server_dir}\\DedicatedServer64"
+        dedicated64.text = str(Path(server_dir) / "DedicatedServer64")
 
     if torch_dir:
         torch = group.find("Torch")
@@ -223,16 +298,22 @@ def main() -> None:
             print("Skipping project rename")
 
     if _input_question("Auto-detect reference locations? (Y/N) [Y]: ", True):
-        vdf_path = f"{_get_steam_path()}\\steamapps\\libraryfolders.vdf"
+        steam_path = _get_steam_path()
+        if steam_path is None:
+            print("Could not find Steam install location.")
+            input("Done. (Press any key to exit)")
+            return
+
+        vdf_path = str(Path(steam_path) / "steamapps" / "libraryfolders.vdf")
         locations = _get_install_locations(vdf_path, ["244850", "298740"])
 
         if locations["244850"] is not None:
-            print(f"Found Space Engineers Under {locations["244850"]}")
+            print(f"Found Space Engineers under {locations['244850']}")
         else:
             print("Could not find Space Engineers install location.")
 
         if locations["298740"] is not None:
-            print(f"Found Dedicated Server Under {locations["298740"]}")
+            print(f"Found Dedicated Server under {locations['298740']}")
         else:
             print("Could not find Dedicated Server install location.")
 

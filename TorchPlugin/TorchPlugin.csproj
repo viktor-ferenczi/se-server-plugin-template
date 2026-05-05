@@ -608,6 +608,7 @@
 
   <ItemGroup>
     <Content Include="Deploy.bat" />
+    <Content Include="Deploy.sh" />
     <Content Include="manifest.xml">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -644,13 +645,22 @@
   </ItemGroup>  
   -->
 
-  <PropertyGroup>
-    <PreBuildEvent>call "$(SolutionDir)\verify_props.bat" "$(Torch)"</PreBuildEvent>
-  </PropertyGroup>
+  <Target Name="VerifyProps" BeforeTargets="BeforeBuild">
+    <Exec Condition="$([MSBuild]::IsOSPlatform('Windows'))"
+          Command="call &quot;$(SolutionDir)verify_props.bat&quot; &quot;$(Torch)&quot;" />
+    <Exec Condition="!$([MSBuild]::IsOSPlatform('Windows'))"
+          Command="sh &quot;$(SolutionDir)verify_props.sh&quot; &quot;$(Torch)&quot;" />
+  </Target>
 
-  <PropertyGroup>
-    <PostBuildEvent>call "$(MSBuildProjectDirectory)\Deploy.bat" "$(AssemblyName).dll" "$(MSBuildProjectDirectory)\$(OutputPath)$(TargetFramework)" "$(Torch)" "$(SolutionName)"</PostBuildEvent>
-  </PropertyGroup>
+  <Target Name="DeployPlugin" AfterTargets="Build" Condition="'$(RunPostBuildEvent)' != 'Never'">
+    <PropertyGroup>
+      <DeploySourceDir>$(MSBuildProjectDirectory)$(PathSeparator)$(OutputPath)$(TargetFramework)</DeploySourceDir>
+    </PropertyGroup>
+    <Exec Condition="$([MSBuild]::IsOSPlatform('Windows'))"
+          Command="call &quot;$(MSBuildProjectDirectory)\Deploy.bat&quot; &quot;$(AssemblyName).dll&quot; &quot;$(DeploySourceDir)&quot; &quot;$(Torch)&quot; &quot;$(SolutionName)&quot;" />
+    <Exec Condition="!$([MSBuild]::IsOSPlatform('Windows'))"
+          Command="sh &quot;$(MSBuildProjectDirectory)/Deploy.sh&quot; &quot;$(AssemblyName).dll&quot; &quot;$(DeploySourceDir)&quot; &quot;$(Torch)&quot; &quot;$(SolutionName)&quot;" />
+  </Target>
 
   <Import Project="..\Shared\Shared.projitems" Label="Shared" />
 </Project>

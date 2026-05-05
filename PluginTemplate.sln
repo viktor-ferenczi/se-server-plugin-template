@@ -13,6 +13,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.gitignore = .gitignore
 		README.md = README.md
 		AGENTS.md = AGENTS.md
+		verify_props.bat = verify_props.bat
+		verify_props.sh = verify_props.sh
+		Clean.bat = Clean.bat
+		Clean.sh = Clean.sh
 		PluginTemplate.xml = PluginTemplate.xml
 		LICENSE = LICENSE
 	EndProjectSection
