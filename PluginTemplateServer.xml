@@ -8,7 +8,7 @@
     <RepoId>todo-github-user/project-name</RepoId>
 
     <!-- The name of your plugin that will appear in the plugin list -->
-    <FriendlyName>TODO ServerPluginTemplate</FriendlyName>
+    <FriendlyName>TODO PluginTemplateServer</FriendlyName>
 
     <!-- The author name that you want to appear in the plugin list -->
     <Author>TODO Author Name</Author>
