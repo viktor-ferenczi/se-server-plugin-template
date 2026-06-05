@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 Replaces project GUIDs and renames the solution
 Requires Python 3.12 or newer.
@@ -5,10 +6,10 @@ Requires Python 3.12 or newer.
 
 import os
 import re
-import sys
 import uuid
 import xml.etree.ElementTree as ET
 from pathlib import Path
+import sys
 from typing import Iterator, Tuple
 
 if sys.platform == "win32":
@@ -16,15 +17,20 @@ if sys.platform == "win32":
 
 DRY_RUN = False
 
+TEMPLATE_NAME = 'PluginTemplate'
+
 PT_PROJECT_NAME = r"^([A-Z][a-z_0-9]+)+$"
 RX_PROJECT_NAME = re.compile(PT_PROJECT_NAME)
 
 PROJECT_NAMES = (
     "ClientPlugin",
-    "TorchPlugin",
-    "DedicatedPlugin",
+    "ServerPlugin",
     "Shared",
 )
+
+# Steam app ids of the games providing the build references
+GAME_APP_ID = "244850"  # Space Engineers (Bin64)
+DEDICATED_APP_ID = "298740"  # Space Engineers Dedicated Server (DedicatedServer64)
 
 
 def _generate_guid() -> str:
@@ -83,19 +89,20 @@ def _input_question(prompt: str, default: bool | None = None) -> bool:
 
 
 def _rename_project(name: str) -> None:
-    torch_guid = _generate_guid()
     replacements = {
-        "PluginTemplate": name,
+        TEMPLATE_NAME: name,
         "A061FC6C-713E-42CD-B413-151AC8A5074C": _generate_guid().upper(),
         "FFB7FCA3-B168-43F4-8DBF-6247C0D331C8": _generate_guid().upper(),
         "C5784FE0-CF0A-4870-9DEF-7BEA8B64C01A": _generate_guid().upper(),
-        "C889318F-9835-4814-B26E-979242CAEB0C": torch_guid.upper(),
-        "c889318f-9835-4814-b26e-979242caeb0c": torch_guid,
     }
 
     def iter_paths() -> Iterator[Tuple[str, str]]:
         print("Solution:")
-        for filename in ('PluginTemplate.sln', 'PluginTemplate.xml'):
+        for filename in (
+            f'{TEMPLATE_NAME}.sln',
+            f'{TEMPLATE_NAME}Client.xml',
+            f'{TEMPLATE_NAME}Server.xml',
+        ):
             if os.path.exists(filename):
                 yield filename, filename
 
@@ -118,13 +125,13 @@ def _rename_project(name: str) -> None:
     for filename, path in iter_paths():
         print(f"  {filename}")
         _replace_text_in_file(replacements, path)
-        if "PluginTemplate" in filename:
+        if TEMPLATE_NAME in filename:
             rename_files.append((filename, path))
 
     if not DRY_RUN:
         for filename, path in rename_files:
             dir_path = os.path.dirname(path)
-            dst_name = filename.replace("PluginTemplate", name)
+            dst_name = filename.replace(TEMPLATE_NAME, name)
             dst_path = os.path.join(dir_path, dst_name)
             os.rename(path, dst_path)
 
@@ -256,17 +263,15 @@ def _get_install_locations(vdf_path: str, ids: list[str]) -> dict[str, str | Non
 def _update_props(
     game_dir: str | None = None,
     server_dir: str | None = None,
-    torch_dir: str | None = None,
 ) -> None:
+    if not game_dir and not server_dir:
+        return
+
     parser = ET.XMLParser(target=ET.TreeBuilder(insert_comments=True))
     tree = ET.parse("Directory.Build.props", parser)
     root = tree.getroot()
     group = root.find("PropertyGroup")
     assert group is not None
-    
-    # If Torch is found, then use the DedicatedServer64 from Torch
-    if torch_dir:
-        server_dir = torch_dir
 
     if game_dir:
         bin64 = group.find("Bin64")
@@ -278,18 +283,13 @@ def _update_props(
         assert dedicated64 is not None
         dedicated64.text = str(Path(server_dir) / "DedicatedServer64")
 
-    if torch_dir:
-        torch = group.find("Torch")
-        assert torch is not None
-        torch.text = torch_dir
-
     tree.write("Directory.Build.props")
 
 
 def main() -> None:
     """Run the setup."""
 
-    if os.path.isfile("PluginTemplate.sln"):
+    if os.path.isfile(f"{TEMPLATE_NAME}.sln"):
         plugin_name = _input_plugin_name()
 
         if plugin_name:
@@ -305,23 +305,19 @@ def main() -> None:
             return
 
         vdf_path = str(Path(steam_path) / "steamapps" / "libraryfolders.vdf")
-        locations = _get_install_locations(vdf_path, ["244850", "298740"])
+        locations = _get_install_locations(vdf_path, [GAME_APP_ID, DEDICATED_APP_ID])
 
-        if locations["244850"] is not None:
-            print(f"Found Space Engineers under {locations['244850']}")
+        if locations[GAME_APP_ID] is not None:
+            print(f"Found Space Engineers under {locations[GAME_APP_ID]}")
         else:
             print("Could not find Space Engineers install location.")
 
-        if locations["298740"] is not None:
-            print(f"Found Dedicated Server under {locations['298740']}")
+        if locations[DEDICATED_APP_ID] is not None:
+            print(f"Found Dedicated Server under {locations[DEDICATED_APP_ID]}")
         else:
             print("Could not find Dedicated Server install location.")
 
-        locations["torch"] = (
-            input("Enter Torch path (leave blank if installed into DS): ")
-            or locations["298740"]
-        )
-        _update_props(locations["244850"], locations["298740"], locations["torch"])
+        _update_props(locations[GAME_APP_ID], locations[DEDICATED_APP_ID])
     else:
         print("Please add the paths manually to 'Directory.Build.props'")
 

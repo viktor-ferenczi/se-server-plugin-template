@@ -10,7 +10,7 @@ using VRage.FileSystem;
 using VRage.Game;
 using VRage.Plugins;
 
-namespace DedicatedPlugin;
+namespace ServerPlugin;
 
 // ReSharper disable once UnusedType.Global
 public class Plugin : IPlugin, ICommonPlugin
