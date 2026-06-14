@@ -75,9 +75,8 @@ for any new method you patch, just leave the string initially empty in the `Ensu
 attribute, then replace with the value from the error log line after you run your plugin
 with the patch for the first time.
 
-On Proton (Linux) this check tends to cause issues, therefore there is a configuration flag
-to turn it OFF. Setting the `SE_PLUGIN_DISABLE_METHOD_VERIFICATION` environment variable to
-any value on the player's host also disables game code verification.
+On Proton (Linux) this check tends to cause issues, therefore it is automatically skipped
+when the plugin detects it is running under Wine/Proton.
 
 ### Debugging
 
